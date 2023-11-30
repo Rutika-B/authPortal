@@ -10,23 +10,28 @@ export class AuthService {
   }
   async createAccount({ email, password }) {
     try {
-      const { returedData, error } = await this.supabase.auth.signUp({
+      const { user, error } = await this.supabase.auth.signUp({
         email,
         password,
-        options: {
-          emailRedirectTo: "https//example.com/welcome",
-        },
       });
+      if (error) {
+        console.log(error);
+        return error;
+      }
     } catch (error) {
       throw error;
     }
   }
   async loginToact({ email, password }) {
     try {
-      const { returndData, error } = await this.supabase.auth.signInWithPassword({
+      const { user, error } = await this.supabase.auth.signInWithPassword({
         email,
         password,
       });
+      if (error) {
+        console.log(error);
+        return error;
+      }
     } catch (error) {
       throw error;
     }

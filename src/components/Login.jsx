@@ -5,25 +5,34 @@ import Button from "../components/Button";
 import Input from "../components/Input";
 import { Link, useNavigate } from "react-router-dom";
 import authService from "../SupabaseConf/authconf";
+import {sha256} from "crypto-hash";
 
 function Login() {
   const [error, setError] = useState("");
   const { register, handleSubmit } = useForm();
-    const navigate=useNavigate();
+  const navigate = useNavigate();
   const login = async (data) => {
     setError("");
     try {
-        console.log(data);
-      await authService.loginToact(data);
-      navigate("/");
       
+      data.password=await sha256(data.password);
+      const flag=await authService.loginToact(data);
+      if (flag) {
+        throw flag;
+      }
+      else
+      {
+
+        navigate("/");
+      }
+    
     } catch (error) {
       setError(error.message);
     }
   };
 
   return (
-    <div className="flex items-center justify-center ">
+    <div className="flex items-center justify-center m-4">
       <div
         className={`mx-auto w-full max-w-lg bg-indigo-200 rounded-xl p-10 border-black/10`}
       >
@@ -36,7 +45,6 @@ function Login() {
             to="/SignUp"
             className="font-medium text-primary transition-all duration-200 hover:underline"
           >
-            
             Sign Up
           </Link>
         </p>

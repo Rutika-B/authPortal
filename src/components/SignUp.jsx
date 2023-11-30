@@ -6,28 +6,31 @@ import Input from "../components/Input";
 import Login from "./Login";
 import authService from "../SupabaseConf/authconf";
 import { Link, useNavigate } from "react-router-dom";
-
-
+import {sha256} from "crypto-hash";
 
 function Signup() {
- 
-
   const [error, setError] = useState("");
   const { register, handleSubmit } = useForm();
-    const navigate=useNavigate();
+  const navigate = useNavigate();
   const create = async (data) => {
     setError("");
+    data.password=await sha256(data.password);
+    
     try {
       console.log(data);
-      await authService.createAccount(data);
-      navigate("/");
+      const flag = await authService.createAccount(data);
+      if (flag) {
+        throw flag;
+      } else {
+        navigate("/");
+      }
     } catch (error) {
       setError(error.message);
     }
   };
-  const handleClick=()=>{
-    return <Login/>
-  }
+  const handleClick = () => {
+    return <Login />;
+  };
   return (
     <div className="flex items-center justify-center py-8">
       <div
@@ -38,9 +41,7 @@ function Signup() {
         </h2>
         <p className="mt-2 text-center text-base text-black/60">
           already have any account?&nbsp;
-          <Link to={"/Login"}>
-            Login
-          </Link>
+          <Link to={"/Login"}>Login</Link>
         </p>
         {error && <p className="text-red-600 mt-8 text-center">{error}</p>}
         <form onSubmit={handleSubmit(create)}>
